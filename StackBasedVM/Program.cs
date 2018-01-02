@@ -13,7 +13,7 @@ namespace StackBasedVM
         {
             var program = File.ReadAllText("program.asm");
             var assembled = Assembler.assemble(program);
-            var vm = new Vm(assembled, 0, 0);
+            var vm = new Vm(assembled, 0, 1);
 
             vm.Exec();
         }

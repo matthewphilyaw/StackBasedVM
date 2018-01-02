@@ -38,9 +38,9 @@ namespace StackBasedVM
             { "brf", new Instruction(8, 1) },
             { "iconst", new Instruction(9, 1) },
             { "load", new Instruction(10, 0) },
-            { "gload", new Instruction(11, 0) },
+            { "gload", new Instruction(11, 1) },
             { "store", new Instruction(12, 0) },
-            { "gstore", new Instruction(13, 0) },
+            { "gstore", new Instruction(13, 1) },
             { "print", new Instruction(14, 0) },
             { "pop", new Instruction(15, 0) },
             { "call", new Instruction(16, 0) },
@@ -57,12 +57,12 @@ namespace StackBasedVM
             int currentAddr = -1;
             foreach (var line in program.Split(new[] { Environment.NewLine}, StringSplitOptions.None ))
             {
-                currentAddr++;
-                if (String.IsNullOrWhiteSpace(line))
+                if (String.IsNullOrWhiteSpace(line) || line.StartsWith(";"))
                 {
                     continue;
                 }
 
+                currentAddr++;
                 var tokens = line.Split(' ');
 
                 if (tokens.Length < 1)
@@ -73,7 +73,6 @@ namespace StackBasedVM
                 var keyword = tokens[0];
                 var instr = keywords[keyword.ToLower()];
 
-                // Each arg bumps the current addr
                 lines.Add(new Line()
                 {
                     Instruction = instr,
@@ -81,6 +80,7 @@ namespace StackBasedVM
                     Address = currentAddr
                 });
 
+                // Each arg bumps the current addr
                 currentAddr += instr.NumArgs;
             }
 
@@ -131,8 +131,6 @@ namespace StackBasedVM
 
         private static int calcJump(List<Line> lines, int jump)
         {
-
-            // Line to end on. VM expects code addr, not lines so we have to walk each line to account for arguments
             if (jump < 0 || jump > lines.Count)
             {
                 throw new Exception("Tried to jump outside of code space");

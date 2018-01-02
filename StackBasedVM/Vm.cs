@@ -38,11 +38,11 @@ namespace StackBasedVM
                 { Bytecode.BRF     , brf    },
                 { Bytecode.ICONST  , iconst },
                 { Bytecode.LOAD    , this.NotImplemented },
-                { Bytecode.GLOAD   , this.NotImplemented },
+                { Bytecode.GLOAD   , gload  },
                 { Bytecode.STORE   , this.NotImplemented },
-                { Bytecode.GSTORE  , this.NotImplemented },
+                { Bytecode.GSTORE  , gstore },
                 { Bytecode.PRINT   , print  },
-                { Bytecode.POP     , this.NotImplemented },
+                { Bytecode.POP     , pop    },
                 { Bytecode.CALL    , this.NotImplemented },
                 { Bytecode.RET     , this.NotImplemented },
                 { Bytecode.HALT    , this.NotImplemented },
@@ -73,7 +73,6 @@ namespace StackBasedVM
             while(opcode != Bytecode.HALT && ip < code.Length)
             {
                 ip++;
-                // Will change the ip pointer most likely when the function executes
                 opcodes[opcode]();
                 opcode = code[ip];
             }
@@ -165,6 +164,27 @@ namespace StackBasedVM
                 // continue onto the next instruction since there is no branch
                 ip++;
             }
+        }
+
+        private void gload()
+        {
+            int addr = code[ip++];
+            int val = data[addr];
+
+            stack[++sp] = val;
+        }
+
+        private void gstore()
+        {
+            int addr = code[ip++];
+            int val = stack[sp--];
+
+            data[addr] = val;
+        }
+
+        private void pop()
+        {
+            --sp;
         }
 
         private void iconst()
